@@ -1,44 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container, Row, Col, InputGroup, FormControl, Form } from 'react-bootstrap';
 import styles from './PhoneNumbersFilter.module.css';
+import { debounce } from "lodash";
 
 import {
     setId,
     setValue,
     setMonthyPrice,
     setSetupPrice,
-    setCurrency
+    setCurrency,
+    selectFilter
 } from './phoneNumbersFilterSlice';
+
 
 export function PhoneNumbersFilter() {
     const dispatch = useDispatch();
-    const filter = useSelector(state => state);
-    
-    const handleFilterChanged = (field, event) => {
+    const filter = useSelector(selectFilter);
+
+    const updateFilter = (field, value) => {
+        console.log(field);
         switch (field) {
             case 'id':
-                dispatch(setId(event.target.value));
+                dispatch(setId(value));
                 break;
 
             case 'value':
-                dispatch(setValue(event.target.value));
+                dispatch(setValue(value));
                 break;
 
             case 'monthyPrice':
-                dispatch(setMonthyPrice(event.target.value));
+                dispatch(setMonthyPrice(value));
                 break;
 
             case 'setupPrice':
-                dispatch(setSetupPrice(event.target.value));
+                dispatch(setSetupPrice(value));
                 break;
 
             case 'currency':
-                dispatch(setCurrency(event.target.value));
+                dispatch(setCurrency(value));
                 break;
-        }
-        
+        } 
     };
+    
+    const handleFilterChanged = debounce((field, event) => {           
+        var value = event.target.value;
+        updateFilter(field, value);          
+    }, 500);
+
+
 
     return (
     <div>
@@ -50,7 +60,7 @@ export function PhoneNumbersFilter() {
                             <InputGroup.Prepend>
                             <InputGroup.Text id="filterId">ID</InputGroup.Text>
                             </InputGroup.Prepend>
-                            <FormControl onChange={ (event) => { handleFilterChanged('id', event); } } />
+                            <FormControl  onChange={ (event) => { event.persist(); handleFilterChanged('id', event); } } />
                         </InputGroup>
                     </Col>
                     <Col>
@@ -58,7 +68,7 @@ export function PhoneNumbersFilter() {
                             <InputGroup.Prepend>
                             <InputGroup.Text id="filterValue">Number</InputGroup.Text>
                             </InputGroup.Prepend>
-                            <FormControl onChange={ (event) => { handleFilterChanged('value', event); } } />
+                            <FormControl onChange={ (event) => { event.persist(); handleFilterChanged('value', event); } } />
                         </InputGroup>
                     </Col>
                     <Col>
@@ -66,7 +76,7 @@ export function PhoneNumbersFilter() {
                             <InputGroup.Prepend>
                             <InputGroup.Text id="filterMonthyPrice">Monthy Price</InputGroup.Text>
                             </InputGroup.Prepend>
-                            <FormControl onChange={ (event) => { handleFilterChanged('monthyPrice', event); } } />
+                            <FormControl onChange={ (event) => { event.persist(); handleFilterChanged('monthyPrice', event); } } />
                         </InputGroup>
                     </Col>
                     <Col>
@@ -74,7 +84,7 @@ export function PhoneNumbersFilter() {
                             <InputGroup.Prepend>
                             <InputGroup.Text id="filterSetupPrice">Setup Price</InputGroup.Text>
                             </InputGroup.Prepend>
-                            <FormControl onChange={ (event) => { handleFilterChanged('setupPrice', event); } } />
+                            <FormControl onChange={ (event) => { event.persist(); handleFilterChanged('setupPrice', event); } } />
                         </InputGroup>
                     </Col>
                     <Col>
@@ -82,7 +92,7 @@ export function PhoneNumbersFilter() {
                             <InputGroup.Prepend>
                             <InputGroup.Text id="filterCurrency">Currency</InputGroup.Text>
                             </InputGroup.Prepend>
-                            <FormControl onChange={ (event) => { handleFilterChanged('currency', event); } } />
+                            <FormControl onChange={ (event) => { event.persist(); handleFilterChanged('currency', event); } } />
                         </InputGroup>
                     </Col>
                 </Row>

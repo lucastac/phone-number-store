@@ -6,38 +6,56 @@ import { PhoneNumbersModal } from '../phone-numbers-modal/PhoneNumbersModal';
 import styles from './PhoneNumbers.module.css';
 
 import {
-    removeNumberAsync,
-    loadData,
-    selectNumbers 
+    retrieveNumbers,
+    removeNumberServer,
+    selectNumbers,
+    selectPagination,
+    selectLoading
 } from './phoneNumbersSlice';
 
 import {
-    selectFilter 
+    selectFilter
 } from '../phone-numbers-filter/phoneNumbersFilterSlice';
 
 export function PhoneNumbers() {
     const dispatch = useDispatch();
     const [showModal, setShowModal] = useState(false);
-    const allNumbers = useSelector(selectNumbers);
+    const isLoading = useSelector(selectLoading);
+    const numbers = useSelector(selectNumbers);
     const filter = useSelector(selectFilter);
+    const pagination = useSelector(selectPagination);
     const [editingNumber, setEditingNumber] = useState({});
 
-    const filterNumbers = (allNumbers, filter) => {
-        return allNumbers.filter(n => {
-            if (filter.id && !n.id.toString().includes(filter.id)) return false;
-            if (filter.value && !n.value.includes(filter.value)) return false;
-            if (filter.monthyPrice && !n.monthyPrice.includes(filter.monthyPrice)) return false;
-            if (filter.setupPrice && !n.setupPrice.includes(filter.setupPrice)) return false;
-            if (filter.currency && !n.currency.includes(filter.currency)) return false;
-            return true;
-        });
-    };
-
     React.useEffect(() =>{
-        dispatch(loadData(10));
-    }, [dispatch]);
-    
-    const numbers = filterNumbers(allNumbers, filter);
+        dispatch(retrieveNumbers(filter, pagination));
+    }, [filter, pagination]);
+
+
+    if (isLoading)
+    {
+        return (
+            <div>
+                <Container>
+                    <Button variant="primary" size="lg" block onClick={()=> { setShowModal(true); }}>
+                        Add New Number
+                    </Button>
+                </Container>
+                <PhoneNumbersFilter />        
+                <Container>
+                    <Row id="TableNumbersHeader" className={styles.header}>
+                        <Col >ID</Col>
+                        <Col >Number</Col>
+                        <Col >Monthy Price</Col>
+                        <Col >Setup Price</Col>
+                        <Col >Currency</Col>
+                        <Col >Action</Col>
+                    </Row>
+                    <Row>Loading...</Row>
+                </Container>
+                <PhoneNumbersModal number={editingNumber} show={showModal} onClosed={()=>{ setShowModal(false);  setEditingNumber({}); }} />
+            </div>
+            );
+    }
 
     return (
     <div>

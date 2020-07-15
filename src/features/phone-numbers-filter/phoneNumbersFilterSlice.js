@@ -1,4 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
+import {
+    retrieveNumbers,
+} from '../phone-numbers/phoneNumbersSlice';
 
 export const PhoneNumbersFilterSlice = createSlice({
     name: 'PhoneNumbersFilter',
