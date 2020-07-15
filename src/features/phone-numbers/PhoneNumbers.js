@@ -37,7 +37,10 @@ export function PhoneNumbers() {
 
     // Handle delete number click
     const handleRemoveNumber = (number) => {
-        dispatch(removeNumberServer(number))
+        if(window.confirm(`Are you sure you want to delete the number ${number.id}?`))
+        {
+            dispatch(removeNumberServer(number));
+        }
     }
 
     var Rows;
