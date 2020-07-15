@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 import { PhoneNumbersFilter } from '../phone-numbers-filter/PhoneNumbersFilter';
+import { PhoneNumbersModal } from '../phone-numbers-modal/PhoneNumbersModal';
 import styles from './PhoneNumbers.module.css';
 
 import {
@@ -16,8 +17,10 @@ import {
 
 export function PhoneNumbers() {
     const dispatch = useDispatch();
+    const [showModal, setShowModal] = useState(false);
     const allNumbers = useSelector(selectNumbers);
     const filter = useSelector(selectFilter);
+    const [editingNumber, setEditingNumber] = useState({});
 
     const filterNumbers = (allNumbers, filter) => {
         return allNumbers.filter(n => {
@@ -38,14 +41,20 @@ export function PhoneNumbers() {
 
     return (
     <div>
-        <PhoneNumbersFilter />
+        <Container>
+            <Button variant="primary" size="lg" block onClick={()=> { setShowModal(true); }}>
+                Add New Number
+            </Button>
+        </Container>
+        <PhoneNumbersFilter />        
         <Container>
             <Row id="TableNumbersHeader" className={styles.header}>
                 <Col >ID</Col>
                 <Col >Number</Col>
                 <Col >Monthy Price</Col>
-                <Col >SetupPrice</Col>
+                <Col >Setup Price</Col>
                 <Col >Currency</Col>
+                <Col >Action</Col>
             </Row>
             {numbers.map(number => (
             <Row id={number.id} className={styles.row}>
@@ -54,9 +63,14 @@ export function PhoneNumbers() {
                 <Col >{number.monthyPrice}</Col>
                 <Col >{number.setupPrice}</Col>
                 <Col >{number.currency}</Col>
+                <Col >
+                    <Button variant="primary" onClick={() => { setEditingNumber(number); setShowModal(true);}}>Edit</Button>
+                    <Button variant="danger">Delete</Button>
+                </Col>
             </Row>
             ))}
         </Container>
+        <PhoneNumbersModal number={editingNumber} show={showModal} onClosed={()=>{ setShowModal(false);  setEditingNumber({}); }} />
     </div>
     );
 }

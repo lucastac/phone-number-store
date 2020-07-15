@@ -7,6 +7,7 @@ import Button from 'react-bootstrap/Button';
 import { Counter } from './features/counter/Counter';
 import { PhoneNumbers } from './features/phone-numbers/PhoneNumbers';
 import { useDispatch, useSelector } from 'react-redux';
+import { Header } from './features/header/Header';
 
 function App() {
     const dispatch = useDispatch();
@@ -14,8 +15,12 @@ function App() {
     return (
       <div className="App">
         <header className="App-header">
-          <PhoneNumbers />
+          <Header />
         </header>
+        <body>
+            <PhoneNumbers />
+        </body>
+        <div style={{'margin-bottom':'2em'}}></div>
       </div>
     );
 }
