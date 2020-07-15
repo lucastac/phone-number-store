@@ -10,10 +10,17 @@
     border-radius: 0px 0px 10px 10px;
 }
 
-
 .header{
     background-color: lightblue !important;
     padding: 0.3em;
     font-weight: bold;
     border-radius: 10px 10px 0px 0px;
+}
+
+.spinner{
+    padding: 0.5em;
+    font-size: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

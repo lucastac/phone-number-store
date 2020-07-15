@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button, Spinner } from 'react-bootstrap';
 import { PhoneNumbersFilter } from '../phone-numbers-filter/PhoneNumbersFilter';
 import { PhoneNumbersModal } from '../phone-numbers-modal/PhoneNumbersModal';
 import styles from './PhoneNumbers.module.css';
@@ -9,13 +9,10 @@ import {
     retrieveNumbers,
     removeNumberServer,
     selectNumbers,
+    selectFilter,
     selectPagination,
     selectLoading
 } from './phoneNumbersSlice';
-
-import {
-    selectFilter
-} from '../phone-numbers-filter/phoneNumbersFilterSlice';
 
 export function PhoneNumbers() {
     const dispatch = useDispatch();
@@ -30,31 +27,45 @@ export function PhoneNumbers() {
         dispatch(retrieveNumbers(filter, pagination));
     }, [filter, pagination]);
 
+    const removeNumber = (number) => {
+        dispatch(removeNumberServer(number))
+    }
 
+
+    var Rows;
     if (isLoading)
     {
-        return (
-            <div>
-                <Container>
-                    <Button variant="primary" size="lg" block onClick={()=> { setShowModal(true); }}>
-                        Add New Number
-                    </Button>
-                </Container>
-                <PhoneNumbersFilter />        
-                <Container>
-                    <Row id="TableNumbersHeader" className={styles.header}>
-                        <Col >ID</Col>
-                        <Col >Number</Col>
-                        <Col >Monthy Price</Col>
-                        <Col >Setup Price</Col>
-                        <Col >Currency</Col>
-                        <Col >Action</Col>
-                    </Row>
-                    <Row>Loading...</Row>
-                </Container>
-                <PhoneNumbersModal number={editingNumber} show={showModal} onClosed={()=>{ setShowModal(false);  setEditingNumber({}); }} />
-            </div>
+        Rows =(
+            <Row className={styles.spinner}>
+                <span>Loading...</span>
+                <Spinner animation="border" role="status">
+                </Spinner>
+            </Row>   
             );
+    } else if(numbers.length > 0) {
+        Rows = (
+            <>
+            {numbers.map(number => (
+                <Row id={number.id} className={styles.row}>
+                    <Col >{number.id}</Col>
+                    <Col >{number.value}</Col>
+                    <Col >{number.monthyPrice}</Col>
+                    <Col >{number.setupPrice}</Col>
+                    <Col >{number.currency}</Col>
+                    <Col >
+                        <Button variant="primary" onClick={() => { setEditingNumber(number); setShowModal(true);}}>Edit</Button>
+                        <Button variant="danger" onClick={() => { removeNumber(number);}}>Delete</Button>
+                    </Col>
+                </Row>
+            ))}
+            </>
+        );
+    } else {
+        Rows =(
+            <Row className={styles.spinner}>
+                <span>No numbers match filtering</span>
+            </Row>   
+        );
     }
 
     return (
@@ -74,19 +85,7 @@ export function PhoneNumbers() {
                 <Col >Currency</Col>
                 <Col >Action</Col>
             </Row>
-            {numbers.map(number => (
-            <Row id={number.id} className={styles.row}>
-                <Col >{number.id}</Col>
-                <Col >{number.value}</Col>
-                <Col >{number.monthyPrice}</Col>
-                <Col >{number.setupPrice}</Col>
-                <Col >{number.currency}</Col>
-                <Col >
-                    <Button variant="primary" onClick={() => { setEditingNumber(number); setShowModal(true);}}>Edit</Button>
-                    <Button variant="danger">Delete</Button>
-                </Col>
-            </Row>
-            ))}
+            {Rows}
         </Container>
         <PhoneNumbersModal number={editingNumber} show={showModal} onClosed={()=>{ setShowModal(false);  setEditingNumber({}); }} />
     </div>

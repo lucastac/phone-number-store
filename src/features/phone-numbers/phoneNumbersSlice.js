@@ -11,6 +11,13 @@ export const phoneNumbersSlice = createSlice({
             total: 0,
             page: 1,
             perPage: 10
+        },
+        filter:{
+            id : null,
+            value : null,
+            monthyPrice : null,
+            setupPrice : null,
+            currency : null
         }
     },
     reducers: {
@@ -26,21 +33,40 @@ export const phoneNumbersSlice = createSlice({
         setNumberList: (state, action) => {
             state.numbers = action.payload;
         },
-        setNumber: (state, action) => {
-            state.numbers[action.payload.id] = action.payload;
+        setFilterId: (state, action) => {
+            state.filter.id = action.payload;
+            state.pagination.page = 1;
         },
-        addNumber: (state, action) => {
-            state.idCounter++;
-            action.payload.id = state.idCounter;
-            state.numbers.push(action.payload);
+        setFilterValue: (state, action) => {
+            state.filter.value = action.payload;
+            state.pagination.page = 1;
         },
-        removeNumber: (state, action) => {
-            state.numbers.remove(action.payload);
+        setFilterMonthyPrice: (state, action) => {
+            state.filter.monthyPrice = action.payload;
+            state.pagination.page = 1;
+        },
+        setFilterSetupPrice: (state, action) => {
+            state.filter.setupPrice = action.payload;
+            state.pagination.page = 1;
+        },
+        setFilterCurrency: (state, action) => {
+            state.filter.currency = action.payload;
+            state.pagination.page = 1;
         },
     },
 });
 
-const { setLoading, setSaving, setIdCounter, setNumberList, setNumber, addNumber, removeNumber } = phoneNumbersSlice.actions;
+export const { 
+    setLoading,
+    setSaving,
+    setIdCounter,
+    setNumberList,
+    setFilterId,
+    setFilterValue,
+    setFilterMonthyPrice,
+    setFilterSetupPrice,
+    setFilterCurrency
+} = phoneNumbersSlice.actions;
 
 const generateRandomNumber = (size, min, max) => {
     var s = "";
@@ -97,27 +123,27 @@ const paginateArray = (array, pagination) => {
 
 
 export const updateNumberServer = number => dispatch => {
-    dispatch(setSaving(true));
-    setTimeout(() => {
-        dispatch(setNumber(number));
-        dispatch(setSaving(false));
-    }, 2000);
+    // dispatch(setSaving(true));
+    // setTimeout(() => {
+    //     dispatch(setNumber(number));
+    //     dispatch(setSaving(false));
+    // }, 2000);
 };
 
 export const createNumberServer = number => dispatch => {
-    dispatch(setSaving(true));
-    setTimeout(() => {
-        dispatch(addNumber(number));
-        dispatch(setSaving(false));
-    }, 2000);
+    // dispatch(setSaving(true));
+    // setTimeout(() => {
+    //     dispatch(addNumber(number));
+    //     dispatch(setSaving(false));
+    // }, 2000);
 };
 
 export const removeNumberServer = number => dispatch => {
-    dispatch(setSaving(true));
-    setTimeout(() => {
-        dispatch(removeNumber(number));
-        dispatch(setSaving(false));
-    }, 2000);
+    // dispatch(setSaving(true));
+    // setTimeout(() => {
+    //     dispatch(removeNumber(number));
+    //     dispatch(setSaving(false));
+    // }, 2000);
 };
 
 const filterNumbers = (allNumbers, filter) => {
@@ -150,6 +176,7 @@ export const retrieveNumbers = (filter, pagination) => dispatch => {
 
 
 export const selectNumbers = state => state.phoneNumbers.numbers;
+export const selectFilter = state => state.phoneNumbers.filter;
 export const selectPagination = state => state.phoneNumbers.pagination;
 export const selectLoading = state => state.phoneNumbers.isLoading;
 export const selectSaving = state => state.phoneNumbers.isSaving;

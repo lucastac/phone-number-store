@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Form, FormControl, InputGroup, Button, Modal } from 'react-bootstrap';
-import { PhoneNumbersFilter } from '../phone-numbers-filter/PhoneNumbersFilter';
 
 import {
     removeNumberAsync

@@ -5,13 +5,13 @@ import styles from './PhoneNumbersFilter.module.css';
 import { debounce } from "lodash";
 
 import {
-    setId,
-    setValue,
-    setMonthyPrice,
-    setSetupPrice,
-    setCurrency,
+    setFilterId,
+    setFilterValue,
+    setFilterMonthyPrice,
+    setFilterSetupPrice,
+    setFilterCurrency,
     selectFilter
-} from './phoneNumbersFilterSlice';
+} from '../phone-numbers/phoneNumbersSlice';
 
 
 export function PhoneNumbersFilter() {
@@ -22,23 +22,23 @@ export function PhoneNumbersFilter() {
         console.log(field);
         switch (field) {
             case 'id':
-                dispatch(setId(value));
+                dispatch(setFilterId(value));
                 break;
 
             case 'value':
-                dispatch(setValue(value));
+                dispatch(setFilterValue(value));
                 break;
 
             case 'monthyPrice':
-                dispatch(setMonthyPrice(value));
+                dispatch(setFilterMonthyPrice(value));
                 break;
 
             case 'setupPrice':
-                dispatch(setSetupPrice(value));
+                dispatch(setFilterSetupPrice(value));
                 break;
 
             case 'currency':
-                dispatch(setCurrency(value));
+                dispatch(setFilterCurrency(value));
                 break;
         } 
     };
