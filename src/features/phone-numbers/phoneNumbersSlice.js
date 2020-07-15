@@ -117,15 +117,9 @@ const populateStorageWithRandomNumbers = (quantity) => {
 }
 
 const paginateArray = (array, pagination) => {
-    var pageSlice = pagination.page * pagination.perPage;
+    var pageBegin = (pagination.page - 1) * pagination.perPage;
 
-    if (array.length < pageSlice) {
-        var pageBegin = Math.max(0, array.length - pagination.perPage);
-        array = array.slice(pageBegin, pageBegin + pagination.perPage);
-    } else {
-        var pageBegin = (pagination.page - 1) * pagination.perPage;
-        array = array.slice(pageBegin, pageBegin + pagination.perPage);
-    }
+    array = array.slice(pageBegin, pageBegin + pagination.perPage);
 
     return array;
 }
@@ -170,7 +164,7 @@ export const retrieveNumbers = (filter, pag) => dispatch => {
     dispatch(setLoading(true));
 
     setTimeout(() => {
-        var allNumbers = populateStorageWithRandomNumbers(20);        
+        var allNumbers = populateStorageWithRandomNumbers(800);        
         
         var numbers = filterNumbers(allNumbers, filter);
 

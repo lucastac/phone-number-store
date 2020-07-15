@@ -23,15 +23,54 @@ export function PhoneNumbersPagination() {
         dispatch(setPaginationPage(1));
     };
 
-    let totalPages = Math.max(1, pagination.total / pagination.pageSelect.perPage);
+    let totalPages = Math.ceil(Math.max(1, pagination.total / pagination.pageSelect.perPage));
     let items = [];
-    for (let number = 1; number <= totalPages; number++) {
+    var Pages;
+    for (let number = pagination.pageSelect.page - 2; number <= pagination.pageSelect.page + 2; number++) {
+        if (number <= 0 || number > totalPages) continue;
         items.push(
             <Pagination.Item key={number} active={number === pagination.pageSelect.page} onClick={() => { updatePage(number);}}>
             {number}
             </Pagination.Item>,
         );
     }
+
+    var Begin;
+    var End;
+
+    if (pagination.pageSelect.page > 3)
+    {
+        Begin = (
+            <>
+                <Pagination.Prev onClick={() => { updatePage(pagination.pageSelect.page - 1);}}/>
+                <Pagination.Item onClick={() => { updatePage(1);}}>{1}</Pagination.Item>
+                <Pagination.Ellipsis />
+            </>
+        );
+    } else {
+        Begin = (<></>);
+    }
+
+    if (pagination.pageSelect.page < totalPages - 2)
+    {
+        End = (
+            <>
+                <Pagination.Ellipsis />
+                <Pagination.Item onClick={() => { updatePage(totalPages);}}>{totalPages}</Pagination.Item>
+                <Pagination.Next onClick={() => { updatePage(pagination.pageSelect.page + 1);}}/>
+            </>
+        );
+    } else {
+        End = (<></>);
+    }
+
+    Pages = (
+        <>
+            {Begin}
+            {items}
+            {End}
+        </>
+    );
 
 
     return (
@@ -49,7 +88,7 @@ export function PhoneNumbersPagination() {
                     </Form.Group>
                 </Col>
                 <Col>
-                    <Pagination>{items}</Pagination>
+                    <Pagination>{Pages}</Pagination>
                 </Col>
             </Row>
         </Container>        
