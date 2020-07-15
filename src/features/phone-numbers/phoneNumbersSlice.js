@@ -5,7 +5,7 @@ export const phoneNumbersSlice = createSlice({
     initialState: {
         isLoading: false,
         isSaving: false,
-        idCounter: 0,
+        refreshData: 0,
         numbers: [],
         pagination: {
             total: 0,
@@ -23,14 +23,14 @@ export const phoneNumbersSlice = createSlice({
         }
     },
     reducers: {
+        setRefreshData: (state) => {
+            state.refreshData = 1- state.refreshData;
+        },
         setLoading: (state, action) => {
             state.isLoading = action.payload;
         },
         setSaving: (state, action) => {
             state.isSaving = action.payload;
-        },
-        setIdCounter: (state, action) => {
-            state.idCounter = action.payload;
         },
         setNumberList: (state, action) => {
             state.numbers = action.payload;
@@ -65,8 +65,8 @@ export const phoneNumbersSlice = createSlice({
 export const { 
     setLoading,
     setSaving,
-    setIdCounter,
     setNumberList,
+    setRefreshData,
     setPaginationTotal,
     setPaginationPage,
     setPaginationPerPage,
@@ -113,6 +113,9 @@ const populateStorageWithRandomNumbers = (quantity) => {
         allNumbers[number.id] = number;      
     }
 
+    localStorage.setItem('allNumbers', JSON.stringify(allNumbers));
+    localStorage.setItem('idCounter', quantity);
+
     return allNumbers;
 }
 
@@ -126,27 +129,48 @@ const paginateArray = (array, pagination) => {
 
 
 export const updateNumberServer = number => dispatch => {
-    // dispatch(setSaving(true));
-    // setTimeout(() => {
-    //     dispatch(setNumber(number));
-    //     dispatch(setSaving(false));
-    // }, 2000);
+    dispatch(setLoading(true));
+    setTimeout(() => {
+
+        var allNumbers = JSON.parse(localStorage.getItem('allNumbers'));
+        allNumbers[number.id] = number;
+        localStorage.setItem('allNumbers', JSON.stringify(allNumbers));
+
+        dispatch(setRefreshData());
+        dispatch(setLoading(false));
+    }, 2000);
 };
 
 export const createNumberServer = number => dispatch => {
-    // dispatch(setSaving(true));
-    // setTimeout(() => {
-    //     dispatch(addNumber(number));
-    //     dispatch(setSaving(false));
-    // }, 2000);
+    dispatch(setLoading(true));
+    setTimeout(() => {
+
+        var idCounter = localStorage.getItem('idCounter');
+
+        number.id = Number(idCounter) + 1;
+
+        localStorage.setItem('idCounter', number.id);
+
+        var allNumbers = JSON.parse(localStorage.getItem('allNumbers'));
+        allNumbers[number.id] = number;
+        localStorage.setItem('allNumbers', JSON.stringify(allNumbers));
+
+        dispatch(setRefreshData())
+        dispatch(setLoading(false));
+    }, 2000);
 };
 
 export const removeNumberServer = number => dispatch => {
-    // dispatch(setSaving(true));
-    // setTimeout(() => {
-    //     dispatch(removeNumber(number));
-    //     dispatch(setSaving(false));
-    // }, 2000);
+    dispatch(setLoading(true));
+    setTimeout(() => {
+
+        var allNumbers = JSON.parse(localStorage.getItem('allNumbers'));
+        delete allNumbers[number.id];
+        localStorage.setItem('allNumbers', JSON.stringify(allNumbers));
+        
+        dispatch(setRefreshData())
+        dispatch(setLoading(false));
+    }, 2000);
 };
 
 const filterNumbers = (allNumbers, filter) => {
@@ -164,7 +188,12 @@ export const retrieveNumbers = (filter, pag) => dispatch => {
     dispatch(setLoading(true));
 
     setTimeout(() => {
-        var allNumbers = populateStorageWithRandomNumbers(800);        
+        var allNumbers = JSON.parse(localStorage.getItem("allNumbers"));
+
+        if(!allNumbers)
+        {
+            allNumbers = populateStorageWithRandomNumbers(800);            
+        }                
         
         var numbers = filterNumbers(allNumbers, filter);
 
@@ -176,7 +205,6 @@ export const retrieveNumbers = (filter, pag) => dispatch => {
 
         numbers = paginateArray(numbers, pagination);
         dispatch(setPaginationTotal(pagination.total));
-        dispatch(setIdCounter(20));
         dispatch(setNumberList(numbers));
         dispatch(setLoading(false));
 
@@ -185,6 +213,7 @@ export const retrieveNumbers = (filter, pag) => dispatch => {
 
 
 export const selectNumbers = state => state.phoneNumbers.numbers;
+export const selectRefreshData = state => state.phoneNumbers.refreshData;
 export const selectFilter = state => state.phoneNumbers.filter;
 export const selectPagination = state => state.phoneNumbers.pagination;
 export const selectPaginationPageSelect = state => state.phoneNumbers.pagination.pageSelect;

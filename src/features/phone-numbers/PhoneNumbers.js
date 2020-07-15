@@ -12,7 +12,8 @@ import {
     selectNumbers,
     selectFilter,
     selectPaginationPageSelect,
-    selectLoading
+    selectLoading,
+    selectRefreshData
 } from './phoneNumbersSlice';
 
 export function PhoneNumbers() {
@@ -22,11 +23,12 @@ export function PhoneNumbers() {
     const numbers = useSelector(selectNumbers);
     const filter = useSelector(selectFilter);
     const pagination = useSelector(selectPaginationPageSelect);
+    const refreshData = useSelector(selectRefreshData);
     const [editingNumber, setEditingNumber] = useState({});
 
     React.useEffect(() =>{
         dispatch(retrieveNumbers(filter, pagination));
-    }, [filter, pagination]);
+    }, [refreshData, filter, pagination]);
 
     const removeNumber = (number) => {
         dispatch(removeNumberServer(number))

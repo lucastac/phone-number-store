@@ -3,12 +3,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Form, FormControl, InputGroup, Button, Modal } from 'react-bootstrap';
 
 import {
+    createNumberServer,
     updateNumberServer
 } from '../phoneNumbersSlice';
 
 export function PhoneNumbersModal({show, onClosed, number}) {
     const dispatch = useDispatch();
-    const formNumber = number;
+    var formNumber = JSON.parse(JSON.stringify(number));
     const modalTitle = formNumber.id ? 'Edit Number' : 'New Number';
 
     if (!formNumber.id)
@@ -24,12 +25,17 @@ export function PhoneNumbersModal({show, onClosed, number}) {
     };
 
     const handleSaveNumber = () => {
-        console.log(formNumber);
+        if (formNumber.id)
+        {
+            dispatch(updateNumberServer(formNumber));
+        } else {
+            dispatch(createNumberServer(formNumber));
+        }
         onClosed();
     };
 
     const handleValueChanged = (field, event) => {
-        formNumber[field] = event.target.value;        
+        formNumber[field] = event.target.value;     
     };
 
     return (
@@ -43,19 +49,19 @@ export function PhoneNumbersModal({show, onClosed, number}) {
                 <Modal.Body>
                     <Form.Group controlId="formNumberValue">
                         <Form.Label>Number</Form.Label>
-                        <Form.Control onChange={(event) => {handleValueChanged('value', event);}} value={formNumber.value} type="text" placeholder="Enter the number" />
+                        <Form.Control onChange={(event) => {handleValueChanged('value', event);}} defaultValue={formNumber.value} type="text" placeholder="Enter the number" />
                     </Form.Group>
                     <Form.Group controlId="formNumberMonthyPrice">
                         <Form.Label>Monthy Price</Form.Label>
-                        <Form.Control onChange={(event) => {handleValueChanged('monthyPrice', event);}} value={formNumber.monthyPrice} type="number" placeholder="Enter the monthy price" />
+                        <Form.Control onChange={(event) => {handleValueChanged('monthyPrice', event);}} defaultValue={formNumber.monthyPrice} type="number" placeholder="Enter the monthy price" />
                     </Form.Group>
                     <Form.Group controlId="formNumberSetupPrice">
                         <Form.Label>Setup Price</Form.Label>
-                        <Form.Control onChange={(event) => {handleValueChanged('setupPrice', event);}} value={formNumber.setupPrice} type="text" placeholder="Enter the setup price" />
+                        <Form.Control onChange={(event) => {handleValueChanged('setupPrice', event);}} defaultValue={formNumber.setupPrice} type="text" placeholder="Enter the setup price" />
                     </Form.Group>
                     <Form.Group controlId="formNumberCurrency">
                         <Form.Label>Currency</Form.Label>
-                        <Form.Control onChange={(event) => {handleValueChanged('currency', event);}} value={formNumber.currency} as="select">
+                        <Form.Control onChange={(event) => {handleValueChanged('currency', event);}} defaultValue={formNumber.currency} as="select">
                             <option>U$</option>
                             <option>R$</option>
                             <option>EUR</option>
