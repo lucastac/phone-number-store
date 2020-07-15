@@ -10,8 +10,9 @@ import {
     setFilterMonthyPrice,
     setFilterSetupPrice,
     setFilterCurrency,
+    setPaginationPage,
     selectFilter
-} from '../phone-numbers/phoneNumbersSlice';
+} from '../phoneNumbersSlice';
 
 
 export function PhoneNumbersFilter() {
@@ -19,7 +20,6 @@ export function PhoneNumbersFilter() {
     const filter = useSelector(selectFilter);
 
     const updateFilter = (field, value) => {
-        console.log(field);
         switch (field) {
             case 'id':
                 dispatch(setFilterId(value));
@@ -40,7 +40,9 @@ export function PhoneNumbersFilter() {
             case 'currency':
                 dispatch(setFilterCurrency(value));
                 break;
-        } 
+        }
+
+        dispatch(setPaginationPage(1));
     };
     
     const handleFilterChanged = debounce((field, event) => {           

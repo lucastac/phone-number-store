@@ -9,8 +9,10 @@ export const phoneNumbersSlice = createSlice({
         numbers: [],
         pagination: {
             total: 0,
-            page: 1,
-            perPage: 10
+            pageSelect:{
+                page: 1,
+                perPage: 10
+            }
         },
         filter:{
             id : null,
@@ -33,25 +35,29 @@ export const phoneNumbersSlice = createSlice({
         setNumberList: (state, action) => {
             state.numbers = action.payload;
         },
+        setPaginationPage: (state, action) => {
+            state.pagination.pageSelect.page = action.payload;
+        },
+        setPaginationPerPage: (state, action) => {
+            state.pagination.pageSelect.perPage = action.payload;
+        },
+        setPaginationTotal: (state, action) => {
+            state.pagination.total = action.payload;
+        },
         setFilterId: (state, action) => {
             state.filter.id = action.payload;
-            state.pagination.page = 1;
         },
         setFilterValue: (state, action) => {
             state.filter.value = action.payload;
-            state.pagination.page = 1;
         },
         setFilterMonthyPrice: (state, action) => {
             state.filter.monthyPrice = action.payload;
-            state.pagination.page = 1;
         },
         setFilterSetupPrice: (state, action) => {
             state.filter.setupPrice = action.payload;
-            state.pagination.page = 1;
         },
         setFilterCurrency: (state, action) => {
             state.filter.currency = action.payload;
-            state.pagination.page = 1;
         },
     },
 });
@@ -61,6 +67,9 @@ export const {
     setSaving,
     setIdCounter,
     setNumberList,
+    setPaginationTotal,
+    setPaginationPage,
+    setPaginationPerPage,
     setFilterId,
     setFilterValue,
     setFilterMonthyPrice,
@@ -157,7 +166,7 @@ const filterNumbers = (allNumbers, filter) => {
     });
 };
 
-export const retrieveNumbers = (filter, pagination) => dispatch => {
+export const retrieveNumbers = (filter, pag) => dispatch => {
     dispatch(setLoading(true));
 
     setTimeout(() => {
@@ -165,8 +174,14 @@ export const retrieveNumbers = (filter, pagination) => dispatch => {
         
         var numbers = filterNumbers(allNumbers, filter);
 
-        numbers = paginateArray(numbers, pagination);
+        var pagination = {
+            total: numbers.length,
+            page: pag.page,
+            perPage: pag.perPage
+        }
 
+        numbers = paginateArray(numbers, pagination);
+        dispatch(setPaginationTotal(pagination.total));
         dispatch(setIdCounter(20));
         dispatch(setNumberList(numbers));
         dispatch(setLoading(false));
@@ -178,6 +193,7 @@ export const retrieveNumbers = (filter, pagination) => dispatch => {
 export const selectNumbers = state => state.phoneNumbers.numbers;
 export const selectFilter = state => state.phoneNumbers.filter;
 export const selectPagination = state => state.phoneNumbers.pagination;
+export const selectPaginationPageSelect = state => state.phoneNumbers.pagination.pageSelect;
 export const selectLoading = state => state.phoneNumbers.isLoading;
 export const selectSaving = state => state.phoneNumbers.isSaving;
 

@@ -3,8 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Form, FormControl, InputGroup, Button, Modal } from 'react-bootstrap';
 
 import {
-    removeNumberAsync
-} from '../phone-numbers/phoneNumbersSlice';
+    updateNumberServer
+} from '../phoneNumbersSlice';
 
 export function PhoneNumbersModal({show, onClosed, number}) {
     const dispatch = useDispatch();

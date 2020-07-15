@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container, Row, Col, Button, Spinner } from 'react-bootstrap';
-import { PhoneNumbersFilter } from '../phone-numbers-filter/PhoneNumbersFilter';
-import { PhoneNumbersModal } from '../phone-numbers-modal/PhoneNumbersModal';
+import { PhoneNumbersFilter } from './phone-numbers-filter/PhoneNumbersFilter';
+import { PhoneNumbersModal } from './phone-numbers-modal/PhoneNumbersModal';
+import { PhoneNumbersPagination } from './phone-numbers-pagination/PhoneNumbersPagination';
 import styles from './PhoneNumbers.module.css';
 
 import {
@@ -10,7 +11,7 @@ import {
     removeNumberServer,
     selectNumbers,
     selectFilter,
-    selectPagination,
+    selectPaginationPageSelect,
     selectLoading
 } from './phoneNumbersSlice';
 
@@ -20,7 +21,7 @@ export function PhoneNumbers() {
     const isLoading = useSelector(selectLoading);
     const numbers = useSelector(selectNumbers);
     const filter = useSelector(selectFilter);
-    const pagination = useSelector(selectPagination);
+    const pagination = useSelector(selectPaginationPageSelect);
     const [editingNumber, setEditingNumber] = useState({});
 
     React.useEffect(() =>{
@@ -75,7 +76,8 @@ export function PhoneNumbers() {
                 Add New Number
             </Button>
         </Container>
-        <PhoneNumbersFilter />        
+        <PhoneNumbersFilter />
+        <PhoneNumbersPagination /> 
         <Container>
             <Row id="TableNumbersHeader" className={styles.header}>
                 <Col >ID</Col>
@@ -86,7 +88,7 @@ export function PhoneNumbers() {
                 <Col >Action</Col>
             </Row>
             {Rows}
-        </Container>
+        </Container>        
         <PhoneNumbersModal number={editingNumber} show={showModal} onClosed={()=>{ setShowModal(false);  setEditingNumber({}); }} />
     </div>
     );
