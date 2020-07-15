@@ -18,25 +18,30 @@ import {
 
 export function PhoneNumbers() {
     const dispatch = useDispatch();
+
+    // Local variables
     const [showModal, setShowModal] = useState(false);
+    const [editingNumber, setEditingNumber] = useState({});
+
+    // Selectors
     const isLoading = useSelector(selectLoading);
     const numbers = useSelector(selectNumbers);
     const filter = useSelector(selectFilter);
     const pagination = useSelector(selectPaginationPageSelect);
     const refreshData = useSelector(selectRefreshData);
-    const [editingNumber, setEditingNumber] = useState({});
-
+    
+    // Dispatch Numbers to update when needed
     React.useEffect(() =>{
         dispatch(retrieveNumbers(filter, pagination));
     }, [refreshData, filter, pagination]);
 
-    const removeNumber = (number) => {
+    // Handle delete number click
+    const handleRemoveNumber = (number) => {
         dispatch(removeNumberServer(number))
     }
 
-
     var Rows;
-    if (isLoading)
+    if (isLoading) // If is loading, show loading spinner
     {
         Rows =(
             <Row className={styles.spinner}>
@@ -45,7 +50,13 @@ export function PhoneNumbers() {
                 </Spinner>
             </Row>   
             );
-    } else if(numbers.length > 0) {
+    } else if(numbers.length == 0) { // If the list is empty, inform this to the user
+        Rows =(
+            <Row className={styles.spinner}>
+                <span>No numbers match filtering</span>
+            </Row>   
+        );
+    } else { // Show the filtered numbers
         Rows = (
             <>
             {numbers.map(number => (
@@ -57,18 +68,12 @@ export function PhoneNumbers() {
                     <Col >{number.currency}</Col>
                     <Col >
                         <Button variant="primary" onClick={() => { setEditingNumber(number); setShowModal(true);}}>Edit</Button>
-                        <Button variant="danger" onClick={() => { removeNumber(number);}}>Delete</Button>
+                        <Button variant="danger" onClick={() => { handleRemoveNumber(number);}}>Delete</Button>
                     </Col>
                 </Row>
             ))}
             </>
-        );
-    } else {
-        Rows =(
-            <Row className={styles.spinner}>
-                <span>No numbers match filtering</span>
-            </Row>   
-        );
+        );       
     }
 
     return (

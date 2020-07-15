@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Form, FormControl, InputGroup, Button, Modal } from 'react-bootstrap';
+import { Form, Button, Modal } from 'react-bootstrap';
 
 import {
     createNumberServer,
@@ -10,8 +10,9 @@ import {
 export function PhoneNumbersModal({show, onClosed, number}) {
     const dispatch = useDispatch();
     var formNumber = JSON.parse(JSON.stringify(number));
-    const modalTitle = formNumber.id ? 'Edit Number' : 'New Number';
+    const modalTitle = formNumber.id ? 'Edit Number' : 'New Number'; // Change title deppending if is editing or creating
 
+    // If is creating, then set default values for the form
     if (!formNumber.id)
     {
         formNumber.value = "";
@@ -20,10 +21,12 @@ export function PhoneNumbersModal({show, onClosed, number}) {
         formNumber.currency = "U$";
     }
 
+    // Handle Close Modal click
     const handleCloseModal = () => {
         onClosed();
     };
 
+    // Handle Save Number click
     const handleSaveNumber = () => {
         if (formNumber.id)
         {
@@ -34,6 +37,7 @@ export function PhoneNumbersModal({show, onClosed, number}) {
         onClosed();
     };
 
+    // Handle when a field changes it value
     const handleValueChanged = (field, event) => {
         formNumber[field] = event.target.value;     
     };

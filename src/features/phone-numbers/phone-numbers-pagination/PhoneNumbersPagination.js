@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container, Pagination, Form, Row, Col } from 'react-bootstrap';
 import styles from './PhoneNumbersPagination.module.css';
@@ -12,38 +12,38 @@ import {
 
 export function PhoneNumbersPagination() {
     const dispatch = useDispatch();
+
+    // Selectors
     const pagination = useSelector(selectPagination);
 
-    const updatePage = (page) => {
+    // Handle update page
+    const handleUpdatePage = (page) => {
         dispatch(setPaginationPage(page));
     };
 
-    const updatePerPage = (perPage) => {
+    // Handle update perPage
+    const handleUpdatePerPage = (perPage) => {
         dispatch(setPaginationPerPage(perPage));
         dispatch(setPaginationPage(1));
     };
 
+    /////////////////////////////////
+    //    MOUNT THE PAGINATION     //
+    /////////////////////////////////
+
     let totalPages = Math.ceil(Math.max(1, pagination.total / pagination.pageSelect.perPage));
-    let items = [];
-    var Pages;
-    for (let number = pagination.pageSelect.page - 2; number <= pagination.pageSelect.page + 2; number++) {
-        if (number <= 0 || number > totalPages) continue;
-        items.push(
-            <Pagination.Item key={number} active={number === pagination.pageSelect.page} onClick={() => { updatePage(number);}}>
-            {number}
-            </Pagination.Item>,
-        );
-    }
 
     var Begin;
+    let Middle = [];
     var End;
 
+    // Mount the Begin part of the pagination
     if (pagination.pageSelect.page > 3)
     {
         Begin = (
             <>
-                <Pagination.Prev onClick={() => { updatePage(pagination.pageSelect.page - 1);}}/>
-                <Pagination.Item onClick={() => { updatePage(1);}}>{1}</Pagination.Item>
+                <Pagination.Prev onClick={() => { handleUpdatePage(pagination.pageSelect.page - 1);}}/>
+                <Pagination.Item onClick={() => { handleUpdatePage(1);}}>{1}</Pagination.Item>
                 <Pagination.Ellipsis />
             </>
         );
@@ -51,23 +51,34 @@ export function PhoneNumbersPagination() {
         Begin = (<></>);
     }
 
+    // Mount the Middle part of the pagination
+    for (let number = pagination.pageSelect.page - 2; number <= pagination.pageSelect.page + 2; number++) {
+        if (number <= 0 || number > totalPages) continue;
+        Middle.push(
+            <Pagination.Item key={number} active={number === pagination.pageSelect.page} onClick={() => { handleUpdatePage(number);}}>
+            {number}
+            </Pagination.Item>,
+        );
+    }
+
+    // Mount the End part of the pagination
     if (pagination.pageSelect.page < totalPages - 2)
     {
         End = (
             <>
                 <Pagination.Ellipsis />
-                <Pagination.Item onClick={() => { updatePage(totalPages);}}>{totalPages}</Pagination.Item>
-                <Pagination.Next onClick={() => { updatePage(pagination.pageSelect.page + 1);}}/>
+                <Pagination.Item onClick={() => { handleUpdatePage(totalPages);}}>{totalPages}</Pagination.Item>
+                <Pagination.Next onClick={() => { handleUpdatePage(pagination.pageSelect.page + 1);}}/>
             </>
         );
     } else {
         End = (<></>);
     }
 
-    Pages = (
+    var Pages = (
         <>
             {Begin}
-            {items}
+            {Middle}
             {End}
         </>
     );
@@ -80,7 +91,7 @@ export function PhoneNumbersPagination() {
                 <Col xs={2}>
                     <Form.Group controlId="numbersPerPage">
                         <Form.Label>Numbers per page</Form.Label>
-                        <Form.Control onChange={(event) => {updatePerPage(event.target.value);}} value={pagination.pageSelect.perPage} as="select">
+                        <Form.Control onChange={(event) => {handleUpdatePerPage(event.target.value);}} value={pagination.pageSelect.perPage} as="select">
                             <option>10</option>
                             <option>20</option>
                             <option>50</option>

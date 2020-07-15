@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container, Row, Col, InputGroup, FormControl, Form } from 'react-bootstrap';
 import styles from './PhoneNumbersFilter.module.css';
@@ -17,8 +17,11 @@ import {
 
 export function PhoneNumbersFilter() {
     const dispatch = useDispatch();
+
+    // Selectors
     const filter = useSelector(selectFilter);
 
+    // Dispatch the new value when the filter is changed
     const updateFilter = (field, value) => {
         switch (field) {
             case 'id':
@@ -45,6 +48,7 @@ export function PhoneNumbersFilter() {
         dispatch(setPaginationPage(1));
     };
     
+    // Handle when some field id changed
     const handleFilterChanged = debounce((field, event) => {           
         var value = event.target.value;
         updateFilter(field, value);          

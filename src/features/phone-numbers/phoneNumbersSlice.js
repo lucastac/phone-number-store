@@ -1,20 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit';
+import ApiHandler from '../api-handler/ApiHander';
 
 export const phoneNumbersSlice = createSlice({
     name: 'phoneNumbers',
     initialState: {
-        isLoading: false,
-        isSaving: false,
-        refreshData: 0,
-        numbers: [],
-        pagination: {
-            total: 0,
+        isLoading: false, // Informs that the data is currently loading
+        refreshData: 0, // Informs that the list view should be refreshed
+        numbers: [], // Array with filtered numbers
+        pagination: { // Pagination data
+            total: 0, // Total length withou the pagination
             pageSelect:{
-                page: 1,
-                perPage: 10
+                page: 1, // Currently delected page
+                perPage: 10 // Length per page
             }
         },
-        filter:{
+        filter:{ // Filter data
             id : null,
             value : null,
             monthyPrice : null,
@@ -28,9 +28,6 @@ export const phoneNumbersSlice = createSlice({
         },
         setLoading: (state, action) => {
             state.isLoading = action.payload;
-        },
-        setSaving: (state, action) => {
-            state.isSaving = action.payload;
         },
         setNumberList: (state, action) => {
             state.numbers = action.payload;
@@ -64,7 +61,6 @@ export const phoneNumbersSlice = createSlice({
 
 export const { 
     setLoading,
-    setSaving,
     setNumberList,
     setRefreshData,
     setPaginationTotal,
@@ -77,147 +73,49 @@ export const {
     setFilterCurrency
 } = phoneNumbersSlice.actions;
 
-const generateRandomNumber = (size, min, max) => {
-    var s = "";
-    for(var i = 0; i < size; i++)
-    {
-        var delta = max - min;
-        var n = Math.floor(Math.random() * delta) + min;
-        s = s + n;
-    }
-    return s;
-};
-
-const populateStorageWithRandomNumbers = (quantity) => {
-
-    var allNumbers = {};
-    for (let i = 0; i < quantity; i++)
-    {
-        var currency = "";
-        var currencyId = Math.floor(Math.random() * 3);
-        switch (currencyId) {
-            case 0: currency = "U$";                
-                break;
-            case 1: currency = "R$";                
-                break;
-            case 2: currency = "EUR";                
-                break;
-        }
-        var number = {
-            id: (i+1),
-            value: "+55 84 9" + generateRandomNumber(4, 0, 9) + "-" + generateRandomNumber(4, 0, 9),
-            monthyPrice: "0." + generateRandomNumber(2, 0, 9),
-            setupPrice: generateRandomNumber(1, 1, 5) + "." + generateRandomNumber(2, 0, 9),
-            currency: currency
-        };
-        allNumbers[number.id] = number;      
-    }
-
-    localStorage.setItem('allNumbers', JSON.stringify(allNumbers));
-    localStorage.setItem('idCounter', quantity);
-
-    return allNumbers;
-}
-
-const paginateArray = (array, pagination) => {
-    var pageBegin = (pagination.page - 1) * pagination.perPage;
-
-    array = array.slice(pageBegin, pageBegin + pagination.perPage);
-
-    return array;
-}
-
-
-export const updateNumberServer = number => dispatch => {
-    dispatch(setLoading(true));
-    setTimeout(() => {
-
-        var allNumbers = JSON.parse(localStorage.getItem('allNumbers'));
-        allNumbers[number.id] = number;
-        localStorage.setItem('allNumbers', JSON.stringify(allNumbers));
-
-        dispatch(setRefreshData());
-        dispatch(setLoading(false));
-    }, 2000);
-};
-
+// Creates a new Number on the server and set the to refresh the data
 export const createNumberServer = number => dispatch => {
     dispatch(setLoading(true));
-    setTimeout(() => {
-
-        var idCounter = localStorage.getItem('idCounter');
-
-        number.id = Number(idCounter) + 1;
-
-        localStorage.setItem('idCounter', number.id);
-
-        var allNumbers = JSON.parse(localStorage.getItem('allNumbers'));
-        allNumbers[number.id] = number;
-        localStorage.setItem('allNumbers', JSON.stringify(allNumbers));
-
-        dispatch(setRefreshData())
+    ApiHandler.createNumber(number).then(()=>{
+        dispatch(setRefreshData());
         dispatch(setLoading(false));
-    }, 2000);
-};
-
-export const removeNumberServer = number => dispatch => {
-    dispatch(setLoading(true));
-    setTimeout(() => {
-
-        var allNumbers = JSON.parse(localStorage.getItem('allNumbers'));
-        delete allNumbers[number.id];
-        localStorage.setItem('allNumbers', JSON.stringify(allNumbers));
-        
-        dispatch(setRefreshData())
-        dispatch(setLoading(false));
-    }, 2000);
-};
-
-const filterNumbers = (allNumbers, filter) => {
-    return Object.values(allNumbers).filter(n => {
-        if (filter.id && !n.id.toString().includes(filter.id)) return false;
-        if (filter.value && !n.value.includes(filter.value)) return false;
-        if (filter.monthyPrice && !n.monthyPrice.includes(filter.monthyPrice)) return false;
-        if (filter.setupPrice && !n.setupPrice.includes(filter.setupPrice)) return false;
-        if (filter.currency && !n.currency.includes(filter.currency)) return false;
-        return true;
     });
 };
 
-export const retrieveNumbers = (filter, pag) => dispatch => {
+// Updates a Number on the server and set the to refresh the data
+export const updateNumberServer = number => dispatch => {
     dispatch(setLoading(true));
-
-    setTimeout(() => {
-        var allNumbers = JSON.parse(localStorage.getItem("allNumbers"));
-
-        if(!allNumbers)
-        {
-            allNumbers = populateStorageWithRandomNumbers(800);            
-        }                
-        
-        var numbers = filterNumbers(allNumbers, filter);
-
-        var pagination = {
-            total: numbers.length,
-            page: pag.page,
-            perPage: pag.perPage
-        }
-
-        numbers = paginateArray(numbers, pagination);
-        dispatch(setPaginationTotal(pagination.total));
-        dispatch(setNumberList(numbers));
+    ApiHandler.updateNumber(number).then(()=>{
+        dispatch(setRefreshData());
         dispatch(setLoading(false));
-
-    }, 2000);    
+    });
 };
 
+// Removes a Number on the server and set the to refresh the data
+export const removeNumberServer = number => dispatch => {
+    dispatch(setLoading(true));
+    ApiHandler.deleteNumber(number).then(()=>{
+        dispatch(setRefreshData());
+        dispatch(setLoading(false));
+    });
+};
 
+// Get all numbers that matchs filtering and pagination criteria
+export const retrieveNumbers = (filter, pagination) => dispatch => {
+    dispatch(setLoading(true));
+    ApiHandler.getNumbers(filter, pagination).then((response)=>{
+        dispatch(setPaginationTotal(response.pagination.total));
+        dispatch(setNumberList(response.data));
+        dispatch(setLoading(false));
+    });  
+};
+
+// Selectors
 export const selectNumbers = state => state.phoneNumbers.numbers;
 export const selectRefreshData = state => state.phoneNumbers.refreshData;
 export const selectFilter = state => state.phoneNumbers.filter;
 export const selectPagination = state => state.phoneNumbers.pagination;
 export const selectPaginationPageSelect = state => state.phoneNumbers.pagination.pageSelect;
 export const selectLoading = state => state.phoneNumbers.isLoading;
-export const selectSaving = state => state.phoneNumbers.isSaving;
 
 export default phoneNumbersSlice.reducer;
